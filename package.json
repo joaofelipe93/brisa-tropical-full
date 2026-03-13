@@ -6,6 +6,7 @@
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "build": "cd frontend && npm run build",
     "update": "git pull origin main && npm run install:all && npm run build",
+    "reset:db": "rm -f backend/data/brisa-tropical.db",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev"
