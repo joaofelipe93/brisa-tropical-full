@@ -208,6 +208,9 @@ function seedDatabase() {
   insertTopping.run("Paçoca", 2.0);
   insertTopping.run("Kiwi", 3.0);
   insertTopping.run("Mel", 2.5);
+  insertTopping.run("Leite em Pó", 0);
+  insertTopping.run("Ovomaltine", 2.0);
+  insertTopping.run("Jujuba", 1.5);
 
   // Bairros de Natal/RN
   const insertNeighborhood = db.prepare(`
