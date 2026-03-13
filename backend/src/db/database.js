@@ -126,7 +126,7 @@ function seedDatabase() {
   const insertCat = db.prepare(
     "INSERT INTO categories (name, slug, icon, sort_order) VALUES (?, ?, ?, ?)",
   );
-  insertCat.run("Açaí no Copo", "acai", "🍇", 1);
+  insertCat.run("Açaí no Copo/Tigela", "acai", "🍇", 1);
   insertCat.run("Combos e Promoções", "combos", "🔥", 2);
   insertCat.run("Complementos", "complementos", "✨", 3);
 
@@ -234,14 +234,14 @@ function seedDatabase() {
   insertNeighborhood.run("Pitimbu", "Oeste", 8.0, 40, 60);
   insertNeighborhood.run("Potengi", "Norte", 9.0, 45, 65);
 
-  // Configurações da loja
+  // Configurações da loja — obrigatoriamente vindas do .env
   const insertSetting = db.prepare(
     "INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)",
   );
-  insertSetting.run("store_name", "Brisa Tropical Açaí");
-  insertSetting.run("pix_key", "016.487.354-60");
-  insertSetting.run("pix_name", "Brisa Tropical Açaí");
-  insertSetting.run("whatsapp_number", "5584991646369");
+  insertSetting.run("store_name", process.env.PIX_NAME || "");
+  insertSetting.run("pix_key", process.env.PIX_KEY || "");
+  insertSetting.run("pix_name", process.env.PIX_NAME || "");
+  insertSetting.run("whatsapp_number", process.env.WHATSAPP_NUMBER || "");
   insertSetting.run("min_order", "15.00");
   insertSetting.run("is_open", "true");
 
@@ -250,13 +250,13 @@ function seedDatabase() {
     INSERT INTO business_hours (day_of_week, open_time, close_time, is_open)
     VALUES (?, ?, ?, ?)
   `);
-  insertHour.run(0, "14:00", "23:59", 1); // Domingo
+  insertHour.run(0, "14:00", "22:00", 1); // Domingo
   insertHour.run(1, "00:00", "00:00", 0); // Segunda fechado
-  insertHour.run(2, "14:00", "23:59", 1); // Terça
-  insertHour.run(3, "14:00", "23:59", 1); // Quarta
-  insertHour.run(4, "14:00", "23:59", 1); // Quinta
-  insertHour.run(5, "14:00", "23:59", 1); // Sexta
-  insertHour.run(6, "13:00", "23:59", 1); // Sábado
+  insertHour.run(2, "14:00", "22:00", 1); // Terça
+  insertHour.run(3, "14:00", "22:00", 1); // Quarta
+  insertHour.run(4, "14:00", "22:00", 1); // Quinta
+  insertHour.run(5, "14:00", "23:00", 1); // Sexta
+  insertHour.run(6, "13:00", "23:00", 1); // Sábado
 
   console.log("🌱 Banco de dados populado com dados iniciais");
 }
