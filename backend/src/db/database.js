@@ -126,7 +126,7 @@ function seedDatabase() {
   const insertCat = db.prepare(
     "INSERT INTO categories (name, slug, icon, sort_order) VALUES (?, ?, ?, ?)",
   );
-  insertCat.run("Açaí no Copo/Tigela", "acai", "🍇", 1);
+  insertCat.run("Açaí no Copo", "acai", "🍇", 1);
   insertCat.run("Combos e Promoções", "combos", "🔥", 2);
   insertCat.run("Complementos", "complementos", "✨", 3);
 

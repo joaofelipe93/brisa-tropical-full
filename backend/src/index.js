@@ -9,9 +9,7 @@ const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
 if (missing.length > 0) {
   console.error("\n❌ ERRO: Variáveis de ambiente obrigatórias não definidas:");
   missing.forEach((k) => console.error(`   - ${k}`));
-  console.error(
-    "\nDefina essas variáveis no arquivo .env ou no painel do Railway.\n",
-  );
+  console.error("\nDefina essas variáveis no arquivo .env.\n");
   process.exit(1);
 }
 
