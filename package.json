@@ -5,12 +5,15 @@
   "scripts": {
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "build": "cd frontend && npm run build",
-    "update": "git pull origin main && npm run install:all && npm run build",
-    "reset:db": "rm -f backend/data/brisa-tropical.db",
-    "migrate:db": "cd backend && npm run migrate",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
-    "dev:backend": "cd backend && npm run dev",
-    "dev:frontend": "cd frontend && npm run dev"
+    "db:migrate": "cd backend && npm run migrate",
+    "db:reset": "rm -f backend/data/brisa-tropical.db",
+    "db:fresh": "npm run db:reset && npm run db:migrate",
+    "setup": "npm run install:all && npm run db:migrate && npm run build",
+    "update": "git pull origin main && npm run setup",
+    "dev": "npm run db:migrate && concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "dev:backend": "npm run db:migrate && cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "npm run db:migrate && cd backend && npm run start"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
