@@ -2,25 +2,25 @@
 // ✅ Seguro para rodar múltiplas vezes: verifica antes de inserir
 // Uso: npm run migrate  ou  npm run db:migrate (na raiz)
 
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
-import dotenv from 'dotenv';
+import Database from "better-sqlite3";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+import dotenv from "dotenv";
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR  = path.join(__dirname, 'data');
-const DB_PATH   = path.join(DATA_DIR, 'brisa-tropical.db');
+const DATA_DIR = path.join(__dirname, "data");
+const DB_PATH = path.join(DATA_DIR, "brisa-tropical.db");
 
 // Garante que a pasta data existe
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
 const db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
-console.log('🔄 Iniciando migração...\n');
+console.log("🔄 Iniciando migração...\n");
 
 // ── 1. Criar tabelas ─────────────────────────────────────────
 db.exec(`
@@ -125,143 +125,189 @@ db.exec(`
     is_open INTEGER DEFAULT 1
   );
 `);
-console.log('✅ Tabelas verificadas');
+console.log("✅ Tabelas verificadas");
 
 // ── 2. Configurações da loja (.env) ──────────────────────────
-const insSet = db.prepare('INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)');
-insSet.run('store_name',      process.env.PIX_NAME        || '');
-insSet.run('pix_key',         process.env.PIX_KEY         || '');
-insSet.run('pix_name',        process.env.PIX_NAME        || '');
-insSet.run('whatsapp_number', process.env.WHATSAPP_NUMBER || '');
-insSet.run('min_order',       '15.00');
-insSet.run('is_open',         'true');
-console.log('✅ Configurações atualizadas');
+const insSet = db.prepare(
+  "INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)",
+);
+insSet.run("store_name", process.env.PIX_NAME || "");
+insSet.run("pix_key", process.env.PIX_KEY || "");
+insSet.run("pix_name", process.env.PIX_NAME || "");
+insSet.run("whatsapp_number", process.env.WHATSAPP_NUMBER || "");
+insSet.run("min_order", "15.00");
+insSet.run("is_open", "true");
+console.log("✅ Configurações atualizadas");
 
 // ── 3. Horários ───────────────────────────────────────────────
-const hoursCount = db.prepare('SELECT COUNT(*) as c FROM business_hours').get();
+const hoursCount = db.prepare("SELECT COUNT(*) as c FROM business_hours").get();
 if (hoursCount.c === 0) {
-  const ins = db.prepare('INSERT INTO business_hours (day_of_week, open_time, close_time, is_open) VALUES (?, ?, ?, ?)');
-  ins.run(0, '14:00', '22:00', 1); // Domingo
-  ins.run(1, '00:00', '00:00', 0); // Segunda — fechado
-  ins.run(2, '14:00', '22:00', 1); // Terça
-  ins.run(3, '14:00', '22:00', 1); // Quarta
-  ins.run(4, '14:00', '22:00', 1); // Quinta
-  ins.run(5, '14:00', '23:00', 1); // Sexta
-  ins.run(6, '13:00', '23:00', 1); // Sábado
-  console.log('✅ Horários inseridos');
+  const ins = db.prepare(
+    "INSERT INTO business_hours (day_of_week, open_time, close_time, is_open) VALUES (?, ?, ?, ?)",
+  );
+  ins.run(0, "14:00", "22:00", 1); // Domingo
+  ins.run(1, "00:00", "00:00", 0); // Segunda — fechado
+  ins.run(2, "14:00", "22:00", 1); // Terça
+  ins.run(3, "14:00", "22:00", 1); // Quarta
+  ins.run(4, "14:00", "22:00", 1); // Quinta
+  ins.run(5, "14:00", "23:00", 1); // Sexta
+  ins.run(6, "13:00", "23:00", 1); // Sábado
+  console.log("✅ Horários inseridos");
 } else {
-  console.log('⏭️  Horários já existem — pulando');
+  console.log("⏭️  Horários já existem — pulando");
 }
 
 // ── 4. Categorias ─────────────────────────────────────────────
-const catCount = db.prepare('SELECT COUNT(*) as c FROM categories').get();
+const catCount = db.prepare("SELECT COUNT(*) as c FROM categories").get();
 if (catCount.c === 0) {
-  const ins = db.prepare('INSERT INTO categories (name, slug, icon, sort_order) VALUES (?, ?, ?, ?)');
-  ins.run('Açaí no Copo',       'acai',        '🍇', 1);
-  ins.run('Combos e Promoções', 'combos',       '🔥', 2);
-  ins.run('Complementos',       'complementos', '✨', 3);
-  console.log('✅ Categorias inseridas');
+  const ins = db.prepare(
+    "INSERT INTO categories (name, slug, icon, sort_order) VALUES (?, ?, ?, ?)",
+  );
+  ins.run("Açaí no Copo", "acai", "🍇", 1);
+  ins.run("Combos e Promoções", "combos", "🔥", 2);
+  ins.run("Complementos", "complementos", "✨", 3);
+  console.log("✅ Categorias inseridas");
 } else {
-  console.log('⏭️  Categorias já existem — pulando');
+  console.log("⏭️  Categorias já existem — pulando");
 }
 
 // ── 5. Produtos ───────────────────────────────────────────────
-const prodCount = db.prepare('SELECT COUNT(*) as c FROM products').get();
+const prodCount = db.prepare("SELECT COUNT(*) as c FROM products").get();
 if (prodCount.c === 0) {
-  const ins = db.prepare('INSERT INTO products (category_id, name, description, price, promo_price, sort_order) VALUES (?, ?, ?, ?, ?, ?)');
-  ins.run(1, 'Açaí 300ml',    'Açaí puro cremoso no copo',        12.00, null,  1);
-  ins.run(1, 'Açaí 500ml',    'Açaí puro cremoso no copo',        18.00, null,  2);
-  ins.run(1, 'Açaí 700ml',    'Açaí puro cremoso no copo',        24.00, null,  3);
-  ins.run(1, 'Açaí 1 Litro',  'Açaí puro cremoso no copo grande', 32.00, null,  4);
-  ins.run(2, 'Combo Casal',   '2 copos de 500ml + 4 complementos',38.00, 32.00, 1);
-  ins.run(2, 'Combo Família', '4 copos de 500ml + 8 complementos',72.00, 59.90, 2);
-  ins.run(2, 'Combo Fit',     'Copo 500ml + 3 frutas + granola',  28.00, 24.00, 3);
-  ins.run(3, 'Granola Extra',    'Porção extra de granola',        2.00, null, 1);
-  ins.run(3, 'Leite Condensado', 'Leite condensado cremoso',       2.00, null, 2);
-  ins.run(3, 'Nutella',          'Dose de Nutella',                4.00, null, 3);
-  ins.run(3, 'Banana',           'Banana fatiada fresca',          1.50, null, 4);
-  ins.run(3, 'Morango',          'Morangos frescos fatiados',      3.00, null, 5);
-  ins.run(3, 'Paçoca',           'Paçoca esfarelada',              2.00, null, 6);
-  console.log('✅ Produtos inseridos');
+  const ins = db.prepare(
+    "INSERT INTO products (category_id, name, description, price, promo_price, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+  );
+  ins.run(1, "Açaí 300ml", "Açaí puro cremoso no copo", 12.0, null, 1);
+  ins.run(1, "Açaí 500ml", "Açaí puro cremoso no copo", 18.0, null, 2);
+  ins.run(1, "Açaí 700ml", "Açaí puro cremoso no copo", 24.0, null, 3);
+  ins.run(1, "Açaí 1 Litro", "Açaí puro cremoso no copo grande", 32.0, null, 4);
+  ins.run(2, "Combo Casal", "2 copos de 500ml + 4 complementos", 38.0, 32.0, 1);
+  ins.run(
+    2,
+    "Combo Família",
+    "4 copos de 500ml + 8 complementos",
+    72.0,
+    59.9,
+    2,
+  );
+  ins.run(2, "Combo Fit", "Copo 500ml + 3 frutas + granola", 28.0, 24.0, 3);
+  ins.run(3, "Granola Extra", "Porção extra de granola", 2.0, null, 1);
+  ins.run(3, "Leite Condensado", "Leite condensado cremoso", 2.0, null, 2);
+  ins.run(3, "Nutella", "Dose de Nutella", 4.0, null, 3);
+  ins.run(3, "Banana", "Banana fatiada fresca", 1.5, null, 4);
+  ins.run(3, "Morango", "Morangos frescos fatiados", 3.0, null, 5);
+  ins.run(3, "Paçoca", "Paçoca esfarelada", 2.0, null, 6);
+  console.log("✅ Produtos inseridos");
 } else {
-  console.log('⏭️  Produtos já existem — pulando');
+  console.log("⏭️  Produtos já existem — pulando");
 }
 
 // ── 6. Toppings ───────────────────────────────────────────────
-const toppingCount = db.prepare('SELECT COUNT(*) as c FROM toppings').get();
+const toppingCount = db.prepare("SELECT COUNT(*) as c FROM toppings").get();
 if (toppingCount.c === 0) {
-  const ins = db.prepare('INSERT INTO toppings (name, price) VALUES (?, ?)');
-  ins.run('Granola',          0);
-  ins.run('Banana',           0);
-  ins.run('Leite Condensado', 0);
-  ins.run('Granola Extra',    2.00);
-  ins.run('Morango',          3.00);
-  ins.run('Nutella',          4.00);
-  ins.run('Paçoca',           2.00);
-  ins.run('Kiwi',             3.00);
-  ins.run('Mel',              2.50);
-  ins.run('Leite em Pó',      0);
-  ins.run('Ovomaltine',       2.00);
-  ins.run('Jujuba',           1.50);
-  console.log('✅ Toppings inseridos');
+  const ins = db.prepare("INSERT INTO toppings (name, price) VALUES (?, ?)");
+  ins.run("Granola", 0);
+  ins.run("Banana", 0);
+  ins.run("Leite Condensado", 0);
+  ins.run("Granola Extra", 2.0);
+  ins.run("Morango", 3.0);
+  ins.run("Nutella", 4.0);
+  ins.run("Paçoca", 2.0);
+  ins.run("Kiwi", 3.0);
+  ins.run("Mel", 2.5);
+  ins.run("Leite em Pó", 0);
+  ins.run("Ovomaltine", 2.0);
+  ins.run("Jujuba", 1.5);
+  console.log("✅ Toppings inseridos");
 } else {
-  console.log('⏭️  Toppings já existem — pulando');
+  console.log("⏭️  Toppings já existem — pulando");
 }
 
 // ── 7. Bairros ────────────────────────────────────────────────
-const neighCount = db.prepare('SELECT COUNT(*) as c FROM neighborhoods').get();
+const neighCount = db.prepare("SELECT COUNT(*) as c FROM neighborhoods").get();
 if (neighCount.c === 0) {
-  const ins = db.prepare('INSERT INTO neighborhoods (name, zone, delivery_fee, min_time, max_time) VALUES (?, ?, ?, ?, ?)');
-  ins.run('Lagoa Nova',      'Sul',   5.00,  30, 45);
-  ins.run('Candelária',      'Sul',   5.00,  30, 45);
-  ins.run('Capim Macio',     'Sul',   6.00,  35, 50);
-  ins.run('Nova Parnamirim', 'Sul',   8.00,  40, 60);
-  ins.run('Ponta Negra',     'Sul',   7.00,  35, 50);
-  ins.run('Neópolis',        'Sul',   6.00,  30, 45);
-  ins.run('Tirol',           'Leste', 6.00,  30, 45);
-  ins.run('Petrópolis',      'Leste', 6.00,  30, 45);
-  ins.run('Alecrim',         'Leste', 7.00,  35, 50);
-  ins.run('Cidade Alta',     'Leste', 7.00,  35, 50);
-  ins.run('Ribeira',         'Leste', 8.00,  40, 60);
-  ins.run('Quintas',         'Norte', 9.00,  45, 65);
-  ins.run('Igapó',           'Norte', 9.00,  45, 65);
-  ins.run('Redinha',         'Norte', 12.00, 50, 70);
-  ins.run('Pajuçara',        'Norte', 9.00,  45, 65);
-  ins.run('Lagoa Azul',      'Norte', 10.00, 45, 65);
-  ins.run('Pitimbu',         'Oeste', 8.00,  40, 60);
-  ins.run('Potengi',         'Norte', 9.00,  45, 65);
-  console.log('✅ Bairros inseridos');
+  const ins = db.prepare(
+    "INSERT INTO neighborhoods (name, zone, delivery_fee, min_time, max_time) VALUES (?, ?, ?, ?, ?)",
+  );
+  ins.run("Lagoa Nova", "Sul", 5.0, 30, 45);
+  ins.run("Candelária", "Sul", 5.0, 30, 45);
+  ins.run("Capim Macio", "Sul", 6.0, 35, 50);
+  ins.run("Nova Parnamirim", "Sul", 8.0, 40, 60);
+  ins.run("Ponta Negra", "Sul", 7.0, 35, 50);
+  ins.run("Neópolis", "Sul", 6.0, 30, 45);
+  ins.run("Tirol", "Leste", 6.0, 30, 45);
+  ins.run("Petrópolis", "Leste", 6.0, 30, 45);
+  ins.run("Alecrim", "Leste", 7.0, 35, 50);
+  ins.run("Cidade Alta", "Leste", 7.0, 35, 50);
+  ins.run("Ribeira", "Leste", 8.0, 40, 60);
+  ins.run("Quintas", "Norte", 9.0, 45, 65);
+  ins.run("Igapó", "Norte", 9.0, 45, 65);
+  ins.run("Redinha", "Norte", 12.0, 50, 70);
+  ins.run("Pajuçara", "Norte", 9.0, 45, 65);
+  ins.run("Lagoa Azul", "Norte", 10.0, 45, 65);
+  ins.run("Pitimbu", "Oeste", 8.0, 40, 60);
+  ins.run("Potengi", "Norte", 9.0, 45, 65);
+  console.log("✅ Bairros inseridos");
 } else {
-  console.log('⏭️  Bairros já existem — pulando');
+  console.log("⏭️  Bairros já existem — pulando");
 }
 
 // ── 8. Passos de personalização ───────────────────────────────
-const stepCount = db.prepare('SELECT COUNT(*) as c FROM customization_steps').get();
+const stepCount = db
+  .prepare("SELECT COUNT(*) as c FROM customization_steps")
+  .get();
 if (stepCount.c === 0) {
-  const insStep = db.prepare('INSERT INTO customization_steps (title, subtitle, emoji, min_selections, max_selections, sort_order) VALUES (?, ?, ?, ?, ?, ?)');
-  insStep.run('ESCOLHA SUAS FRUTAS', 'Escolha 1 opção',         '🍓', 1, 1,  1);
-  insStep.run('COBERTURA OU CALDA',  'Escolha 1 opção',         '🍯', 1, 1,  2);
-  insStep.run('COMPLEMENTOS',        'Escolha de 1 a 5 opções', '🥣', 1, 5,  3);
-  insStep.run('ADICIONAIS',          'Opcional — à vontade',    '✨', 0, 99, 4);
+  const insStep = db.prepare(
+    "INSERT INTO customization_steps (title, subtitle, emoji, min_selections, max_selections, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+  );
+  insStep.run("ESCOLHA SUAS FRUTAS", "Escolha 1 opção", "🍓", 1, 1, 1);
+  insStep.run("COBERTURA OU CALDA", "Escolha 1 opção", "🍯", 1, 1, 2);
+  insStep.run("COMPLEMENTOS", "Escolha de 1 a 5 opções", "🥣", 1, 5, 3);
+  insStep.run("ADICIONAIS", "Opcional — à vontade", "✨", 0, 99, 4);
 
-  const insOpt = db.prepare('INSERT INTO step_options (step_id, name, extra_price, sort_order) VALUES (?, ?, ?, ?)');
+  const insOpt = db.prepare(
+    "INSERT INTO step_options (step_id, name, extra_price, sort_order) VALUES (?, ?, ?, ?)",
+  );
 
-  ['Morango','Banana','Kiwi','Manga','Uva','Sem fruta'].forEach((n, i) =>
-    insOpt.run(1, n, 0, i + 1));
+  ["Morango", "Banana", "Kiwi", "Manga", "Uva", "Sem fruta"].forEach((n, i) =>
+    insOpt.run(1, n, 0, i + 1),
+  );
 
-  ['Leite Condensado','Nutella','Mel','Calda de Chocolate','Calda de Morango','Sem cobertura'].forEach((n, i) =>
-    insOpt.run(2, n, 0, i + 1));
+  [
+    "Leite Condensado",
+    "Nutella",
+    "Mel",
+    "Calda de Chocolate",
+    "Calda de Morango",
+    "Sem cobertura",
+  ].forEach((n, i) => insOpt.run(2, n, 0, i + 1));
 
-  ['Granola','Granola Zero','Paçoca','Bis','Confete','Flocos de Milho','Amendoim','Castanha','Leite em Pó','Ovomaltine','Jujuba'].forEach((n, i) =>
-    insOpt.run(3, n, 0, i + 1));
+  [
+    "Granola",
+    "Granola Zero",
+    "Paçoca",
+    "Bis",
+    "Confete",
+    "Flocos de Milho",
+    "Amendoim",
+    "Castanha",
+    "Leite em Pó",
+    "Ovomaltine",
+    "Jujuba",
+  ].forEach((n, i) => insOpt.run(3, n, 0, i + 1));
 
-  [['Extra de Granola',2],['Extra de Leite Condensado',2],['Extra de Nutella',4],['Extra de Morango',3],['Extra de Banana',1.5]].forEach(([n, p], i) =>
-    insOpt.run(4, n, p, i + 1));
+  [
+    ["Extra de Granola", 2],
+    ["Extra de Leite Condensado", 2],
+    ["Extra de Nutella", 4],
+    ["Extra de Morango", 3],
+    ["Extra de Banana", 1.5],
+  ].forEach(([n, p], i) => insOpt.run(4, n, p, i + 1));
 
-  console.log('✅ Passos de personalização inseridos');
+  console.log("✅ Passos de personalização inseridos");
 } else {
-  console.log('⏭️  Passos já existem — pulando');
+  console.log("⏭️  Passos já existem — pulando");
 }
 
-console.log('\n🎉 Migração concluída!\n');
+console.log("\n🎉 Migração concluída!\n");
 db.close();

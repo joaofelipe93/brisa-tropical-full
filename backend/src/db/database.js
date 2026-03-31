@@ -1,15 +1,15 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import Database from "better-sqlite3";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, '../../data/brisa-tropical.db');
-fs.mkdirSync(path.join(__dirname, '../../data'), { recursive: true });
+const DB_PATH = path.join(__dirname, "../../data/brisa-tropical.db");
+fs.mkdirSync(path.join(__dirname, "../../data"), { recursive: true });
 
 const db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
 export function initDatabase() {
   // ✅ Apenas criação de tabelas
@@ -117,28 +117,34 @@ export function initDatabase() {
   `);
 
   // ✅ Configurações — sempre do .env
-  const insertSetting = db.prepare('INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)');
-  insertSetting.run('store_name',      process.env.PIX_NAME        || '');
-  insertSetting.run('pix_key',         process.env.PIX_KEY         || '');
-  insertSetting.run('pix_name',        process.env.PIX_NAME        || '');
-  insertSetting.run('whatsapp_number', process.env.WHATSAPP_NUMBER || '');
-  insertSetting.run('min_order',       '15.00');
-  insertSetting.run('is_open',         'true');
+  const insertSetting = db.prepare(
+    "INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)",
+  );
+  insertSetting.run("store_name", process.env.PIX_NAME || "");
+  insertSetting.run("pix_key", process.env.PIX_KEY || "");
+  insertSetting.run("pix_name", process.env.PIX_NAME || "");
+  insertSetting.run("whatsapp_number", process.env.WHATSAPP_NUMBER || "");
+  insertSetting.run("min_order", "15.00");
+  insertSetting.run("is_open", "true");
 
   // ✅ Horários — só insere se ainda não existirem
-  const hoursCount = db.prepare('SELECT COUNT(*) as c FROM business_hours').get();
+  const hoursCount = db
+    .prepare("SELECT COUNT(*) as c FROM business_hours")
+    .get();
   if (hoursCount.c === 0) {
-    const insertHour = db.prepare('INSERT INTO business_hours (day_of_week, open_time, close_time, is_open) VALUES (?, ?, ?, ?)');
-    insertHour.run(0, '14:00', '22:00', 1); // Domingo
-    insertHour.run(1, '00:00', '00:00', 0); // Segunda — fechado
-    insertHour.run(2, '14:00', '22:00', 1); // Terça
-    insertHour.run(3, '14:00', '22:00', 1); // Quarta
-    insertHour.run(4, '14:00', '22:00', 1); // Quinta
-    insertHour.run(5, '14:00', '23:00', 1); // Sexta
-    insertHour.run(6, '13:00', '23:00', 1); // Sábado
+    const insertHour = db.prepare(
+      "INSERT INTO business_hours (day_of_week, open_time, close_time, is_open) VALUES (?, ?, ?, ?)",
+    );
+    insertHour.run(0, "14:00", "22:00", 1); // Domingo
+    insertHour.run(1, "00:00", "00:00", 0); // Segunda — fechado
+    insertHour.run(2, "14:00", "22:00", 1); // Terça
+    insertHour.run(3, "14:00", "22:00", 1); // Quarta
+    insertHour.run(4, "14:00", "22:00", 1); // Quinta
+    insertHour.run(5, "14:00", "23:00", 1); // Sexta
+    insertHour.run(6, "13:00", "23:00", 1); // Sábado
   }
 
-  console.log('✅ Banco de dados inicializado');
+  console.log("✅ Banco de dados inicializado");
 }
 
 export default db;
