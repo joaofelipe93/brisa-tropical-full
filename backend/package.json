@@ -9,8 +9,7 @@
     "migrate:002": "node migrations/migrate_002_add_creme_step.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
-    "migrate:002": "node migrations/migrate_002_add_creme_step.js"
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
   },
   "engines": {
     "node": ">=20.0.0"
