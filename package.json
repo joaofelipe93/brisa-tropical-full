@@ -5,7 +5,7 @@
   "scripts": {
     "install:all": "cd backend && npm install && npm rebuild better-sqlite3 && cd ../frontend && npm install",
     "build": "cd frontend && npm run build",
-    "db:migrate": "cd backend && npm run migrate",
+    "db:migrate": "cd backend && npm run seed",
     "db:reset": "rm -f backend/data/brisa-tropical.db",
     "db:fresh": "npm run db:reset && npm run db:migrate",
     "test": "cd backend && npm run test",
