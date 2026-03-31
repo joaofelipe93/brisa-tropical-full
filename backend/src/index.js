@@ -16,6 +16,8 @@ if (missing.length > 0) {
 import { initDatabase } from "./db/database.js";
 import productsRouter from "./routes/products.js";
 import ordersRouter from "./routes/orders.js";
+import authRouter from "./routes/auth.js";
+import adminRouter from "./routes/admin.js";
 
 const app = express();
 
@@ -30,6 +32,8 @@ app.use(express.json());
 
 app.use("/api", productsRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
 
 app.get("/api/whatsapp/status", (req, res) => {
   res.json({ isReady: true, mode: "wa.me" });
