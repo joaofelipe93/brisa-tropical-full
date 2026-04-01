@@ -79,4 +79,56 @@ export const adminRepository = {
     if (products.c > 0) throw new Error('Categoria possui produtos. Remova os produtos primeiro.');
     db.prepare('DELETE FROM categories WHERE id = ?').run(id);
   },
+
+  // ── Passos de personalização ───────────────────────────────
+
+  findAllSteps() {
+    const steps = db.prepare(`
+      SELECT * FROM customization_steps ORDER BY sort_order
+    `).all();
+    return steps.map(step => ({
+      ...step,
+      options: db.prepare(`
+        SELECT * FROM step_options WHERE step_id = ? ORDER BY sort_order
+      `).all(step.id),
+    }));
+  },
+
+  findStepById(id) {
+    return db.prepare('SELECT * FROM customization_steps WHERE id = ?').get(id);
+  },
+
+  updateStep(id, { title, subtitle, emoji, minSelections, maxSelections, sortOrder, active }) {
+    db.prepare(`
+      UPDATE customization_steps
+      SET title = ?, subtitle = ?, emoji = ?, min_selections = ?,
+          max_selections = ?, sort_order = ?, active = ?
+      WHERE id = ?
+    `).run(title, subtitle, emoji, minSelections, maxSelections, sortOrder, active, id);
+  },
+
+  // ── Opções dos passos ──────────────────────────────────────
+
+  findOptionById(id) {
+    return db.prepare('SELECT * FROM step_options WHERE id = ?').get(id);
+  },
+
+  createOption({ stepId, name, extraPrice, sortOrder }) {
+    const result = db.prepare(`
+      INSERT INTO step_options (step_id, name, extra_price, sort_order)
+      VALUES (?, ?, ?, ?)
+    `).run(stepId, name, extraPrice || 0, sortOrder || 0);
+    return result.lastInsertRowid;
+  },
+
+  updateOption(id, { name, extraPrice, sortOrder, active }) {
+    db.prepare(`
+      UPDATE step_options SET name = ?, extra_price = ?, sort_order = ?, active = ?
+      WHERE id = ?
+    `).run(name, extraPrice || 0, sortOrder || 0, active, id);
+  },
+
+  deleteOption(id) {
+    db.prepare('DELETE FROM step_options WHERE id = ?').run(id);
+  },
 };

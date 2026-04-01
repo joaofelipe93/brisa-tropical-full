@@ -1,25 +1,25 @@
 // src/routes/auth.js
-import { Router } from 'express';
-import jwt from 'jsonwebtoken';
+import { Router } from "express";
+import jwt from "jsonwebtoken";
 
 const router = Router();
-const JWT_SECRET  = process.env.JWT_SECRET   || 'brisa-tropical-secret';
-const ADMIN_PASS  = process.env.ADMIN_PASSWORD;
-
+const JWT_SECRET = process.env.JWT_SECRET || "brisa-tropical-secret";
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post("/login", (req, res) => {
   const { password } = req.body;
+  const ADMIN_PASS = process.env.ADMIN_PASSWORD;
 
-  if (!password) return res.status(400).json({ error: 'Senha obrigatória' });
-  if (password !== ADMIN_PASS) return res.status(401).json({ error: 'Senha incorreta' });
+  if (!password) return res.status(400).json({ error: "Senha obrigatória" });
+  if (password !== ADMIN_PASS)
+    return res.status(401).json({ error: "Senha incorreta" });
 
-  const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '8h' });
-  res.json({ token, expiresIn: '8h' });
+  const token = jwt.sign({ role: "admin" }, JWT_SECRET, { expiresIn: "8h" });
+  res.json({ token, expiresIn: "8h" });
 });
 
 // GET /api/auth/verify
-router.get('/verify', (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
+router.get("/verify", (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ valid: false });
 
   try {

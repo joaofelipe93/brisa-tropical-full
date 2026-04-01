@@ -4,6 +4,7 @@ import { getOrders, updateOrderStatus, getTodayStats } from '../../services/api'
 import { verifyToken } from '../../services/adminApi';
 import Login from './Login';
 import Catalog from './Catalog';
+import Steps from './Steps';
 import toast from 'react-hot-toast';
 
 const STATUS_CONFIG = {
@@ -118,6 +119,7 @@ export default function AdminDashboard() {
         {[
           { key: 'orders',  label: '📦 Pedidos' },
           { key: 'catalog', label: '🗂️ Cardápio' },
+          { key: 'steps',   label: '🛠️ Personalização' },
         ].map(item => (
           <button
             key={item.key}
@@ -136,6 +138,8 @@ export default function AdminDashboard() {
       {/* Conteúdo */}
       {activeMenu === 'catalog' ? (
         <Catalog />
+      ) : activeMenu === 'steps' ? (
+        <Steps />
       ) : (
         <div style={{ padding: '16px', maxWidth: '900px', margin: '0 auto' }}>
 
