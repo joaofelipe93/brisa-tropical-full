@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useCart } from '../../context/CartContext';
-import acaiImg from '../../assets/acai-produto.png';
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useCart } from "../../context/CartContext";
+import acaiImg from "../../assets/acai-produto.png";
 
 // Injeta estilo fixo no head uma única vez
-const styleId = 'cart-toast-style';
+const styleId = "cart-toast-style";
 if (!document.getElementById(styleId)) {
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.id = styleId;
   style.textContent = `
     #cart-toast-wrapper {
@@ -69,47 +69,99 @@ export default function AddedToCartToast() {
   if (!toast) return null;
 
   const price = toast.product.promo_price || toast.product.price;
+  let totalPrice = price * toast.quantity;
+  if (toast.toppings?.length > 0) {
+    toast.toppings.forEach((t) => {
+      if (typeof t === "object" && t.price) {
+        totalPrice += t.price * toast.quantity;
+      }
+    });
+  }
 
   return createPortal(
     <div id="cart-toast-wrapper">
-      <div id="cart-toast-inner" className={visible ? 'visible' : 'hidden'}>
-        <div style={{
-          width: 42, height: 42,
-          borderRadius: '12px',
-          overflow: 'hidden',
-          flexShrink: 0,
-          border: '1.5px solid rgba(255,255,255,0.2)'
-        }}>
-          <img src={acaiImg} alt="açaí" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+      <div id="cart-toast-inner" className={visible ? "visible" : "hidden"}>
+        <div
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: "12px",
+            overflow: "hidden",
+            flexShrink: 0,
+            border: "1.5px solid rgba(255,255,255,0.2)",
+          }}
+        >
+          <img
+            src={acaiImg}
+            alt="açaí"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center top",
+            }}
+          />
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            color: 'white', fontWeight: '800', fontSize: '14px',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            margin: 0
-          }}>
+          <p
+            style={{
+              color: "white",
+              fontWeight: "800",
+              fontSize: "14px",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              margin: 0,
+            }}
+          >
             {toast.product.name}
           </p>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', marginTop: '2px', marginBottom: 0 }}>
+          <p
+            style={{
+              color: "rgba(255,255,255,0.7)",
+              fontSize: "12px",
+              marginTop: "2px",
+              marginBottom: 0,
+            }}
+          >
             {toast.quantity}x adicionado ao carrinho
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <span style={{ color: '#fbbf24', fontWeight: '800', fontSize: '15px' }}>
-            R$ {(price * toast.quantity).toFixed(2)}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{ color: "#fbbf24", fontWeight: "800", fontSize: "15px" }}
+          >
+            R$ {totalPrice.toFixed(2)}
           </span>
-          <div style={{
-            width: 26, height: 26, background: '#22c55e',
-            borderRadius: '50%', display: 'flex',
-            alignItems: 'center', justifyContent: 'center',
-            fontSize: '14px', color: 'white', fontWeight: '800',
-            flexShrink: 0
-          }}>✓</div>
+          <div
+            style={{
+              width: 26,
+              height: 26,
+              background: "#22c55e",
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              color: "white",
+              fontWeight: "800",
+              flexShrink: 0,
+            }}
+          >
+            ✓
+          </div>
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
