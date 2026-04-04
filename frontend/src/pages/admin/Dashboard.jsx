@@ -523,7 +523,13 @@ export default function AdminDashboard() {
                                         style={{ color: "var(--gray-500)" }}
                                       >
                                         {" "}
-                                        ({item.toppings.join(", ")})
+                                        (
+                                        {item.toppings
+                                          .map((t) =>
+                                            typeof t === "object" ? t.name : t,
+                                          )
+                                          .join(", ")}
+                                        )
                                       </span>
                                     )}
                                   {item.notes && (
